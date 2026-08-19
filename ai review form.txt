@@ -1,0 +1,22 @@
+    AI Tool:   Gemini (Personal AI Collaborator)
+
+
+    Prompt Used:   Suggest a TypeScript implementation for converting a student's active/inactive status into a readable label. Explain the implementation and include possible edge cases. Do not use the any type.
+
+
+    AI Recommendation:   Provided a TypeScript function utilizing a union type (`StudentStatus = "active" | "inactive"`) and a switch-case statement with an exhaustive `never` check to return readable labels like "Active Student" and "Inactive Student".
+
+
+    What I Understood:   I understood that utilizing strict union types instead of broad types like `string` or `any` ensures that invalid status values are caught early, while exhaustive checking guarantees that all future status states are accounted for.
+
+
+    Recommendation Accepted:   Yes, accepted the core union type structure and conditional formatting logic.
+
+
+    Recommendation Modified:   Simplified the switch-case statement down to an explicit conditional check (`if / else`) or standard conditional block to match project simplicity requirements while keeping type safety intact.
+
+
+    Recommendation Rejected:   None.
+
+
+    Reason:   The core suggestion was fully sound, safe, and met all type-safety standards without requiring any total rejections.

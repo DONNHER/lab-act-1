@@ -1,0 +1,36 @@
+
+### TypeScript Implementation
+
+```typescript
+type StudentStatus = "active" | "inactive";
+
+/**
+ * Converts a student's status into a user-friendly readable label.
+ * @param status - The student's status ("active" or "inactive")
+ * @returns A formatted string label
+ */
+function getStudentStatusLabel(status: StudentStatus): string {
+  if (status === "active") {
+    return "Active Student";
+  }
+  return "Inactive Student";
+}
+
+```
+
+### Explanation of the Implementation
+
+* **Union Types (`StudentStatus`):** The input parameter is restricted to literal string types (`"active"` or `"inactive"`), ensuring that only valid states can be passed into the function.
+
+
+* **Control Flow:** A straightforward conditional check evaluates the status and returns the corresponding readable label (`"Active Student"` or `"Inactive Student"`).
+
+
+* **Type Safety:** The `any` type is completely avoided, maintaining strict static typing across your application.
+
+
+
+### Possible Edge Cases
+
+* **Unhandled or Malformed Strings:** If untyped or unverified data (like raw JSON from an external API) passes an unexpected value (such as `"suspended"` or `""`), TypeScript will flag a compile-time type error if strict types are enforced.
+* **Casing Discrepancies:** Passing uppercase strings like `"ACTIVE"` will result in a type mismatch unless normalized first using string methods like `status.toLowerCase()`.
