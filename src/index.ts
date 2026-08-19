@@ -1,5 +1,5 @@
-import type { ApiResponse } from "./api";
-import { isStudent } from "./api";
+import type { ApiResponse } from "./api.ts";
+import { isStudent } from "./api.ts";
 
 export interface Student {
   id: number;
@@ -11,9 +11,7 @@ export interface Student {
 type StudentStatus = "active" | "inactive";
 
 function getStudentStatusLabel(status: StudentStatus): string {
-  return status === "active"
-    ? "Active Student"
-    : "Inactive Student";
+  return status === "active" ? "Active Student" : "Inactive Student";
 }
 
 function formatStudent(student: Student): string {
@@ -91,39 +89,26 @@ console.log("\n--- Part 7 Output ---");
 if (isStudent(sample)) {
   console.log(formatStudent(sample));
 } else {
-  console.error(
-    "Error: The provided data is not a valid Student object.",
-  );
+  console.error("Error: The provided data is not a valid Student object.");
 }
 
 if (isStudent(sample2)) {
   console.log(formatStudent(sample2));
 } else {
-  console.error(
-    "Error: The provided data is not a valid Student object.",
-  );
+  console.error("Error: The provided data is not a valid Student object.");
 }
 
 if (isStudent(sample3)) {
   console.log(formatStudent(sample3));
 } else {
-  console.error(
-    "Error: The provided data is not a valid Student object.",
-  );
+  console.error("Error: The provided data is not a valid Student object.");
 }
 
-function selectStudentById(
-  id: number,
-  students: Student[],
-): void {
-  const foundStudent = students.find(
-    (student) => student.id === id,
-  );
+function selectStudentById(id: number, students: Student[]): void {
+  const foundStudent = students.find((student) => student.id === id);
 
   if (!foundStudent) {
-    console.error(
-      `Student with ID ${id} was not found.`,
-    );
+    console.error(`Student with ID ${id} was not found.`);
 
     return;
   }
@@ -132,19 +117,13 @@ function selectStudentById(
   console.log(`ID     : ${foundStudent.id}`);
   console.log(`Name   : ${foundStudent.name}`);
   console.log(`Email  : ${foundStudent.email}`);
-  console.log(
-    `Status : ${getStudentStatusLabel(
-      foundStudent.status,
-    )}`,
-  );
+  console.log(`Status : ${getStudentStatusLabel(foundStudent.status)}`);
 }
 
 import * as readline from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 
-console.log(
-  "\n--- Interactive Student Selection ---",
-);
+console.log("\n--- Interactive Student Selection ---");
 
 studentListResponse.data.forEach((student) => {
   console.log(formatStudent(student));
@@ -158,7 +137,11 @@ while (true) {
   );
 
   // Check for exit commands
-  if (!answer || answer.toLowerCase().trim() === "exit" || answer.toLowerCase().trim() === "quit") {
+  if (
+    !answer ||
+    answer.toLowerCase().trim() === "exit" ||
+    answer.toLowerCase().trim() === "quit"
+  ) {
     console.log("Exiting...");
     break;
   }
