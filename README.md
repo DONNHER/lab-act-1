@@ -47,7 +47,7 @@ npm install
 Execute the application directly using Node's modern native TypeScript experimental stripping support:
 
 ```bash
-npm run start
+npm run dev
 
 ```
 
