@@ -3,10 +3,10 @@
 ## Current Phase
 
 - Phase: Phase 2 — Database Schema and Seeders
-- Status: In Progress
-- Current task: Students table schema implemented and verified
+- Status: Completed
+- Current task: All table schemas verified, seeders created, migrate:fresh --seed successful
 - Date: 2026-09-11
-- Overall progress: Phase 0 and 1 complete, Phase 2 in progress (students table done)
+- Overall progress: Phase 0, 1, and 2 complete, ready for Phase 3
 
 ## Phase 0 — Requirements and Business Rules
 
@@ -49,26 +49,28 @@
 
 ## Phase 2 — Database Schema and Seeders
 
-- Status: In Progress
+- Status: Completed
 - Completed: 
   - Created migrations for all 8 tables (users role/status, programs, courses, academic_terms, students, course_offerings, enrollments, grades)
   - All migrations applied successfully (12 total migrations)
-  - Students table schema implemented with all required fields and constraints
+  - All table schemas verified against requirements
+  - Created factories for all models (User, Program, Course, AcademicTerm, Student, CourseOffering, Enrollment, Grade)
+  - Created comprehensive DatabaseSeeder with dependency-ordered seeding
+  - Ran php artisan migrate:fresh --seed successfully
+  - Verified all minimum seed counts met
+  - Verified deterministic fixtures (full offering, two instructors' offerings, published/draft grades)
 - In progress: 
-  - Students table schema verification
 - Pending: 
-  - Verify all other table schemas
-  - Create seeders/factories for all tables
-  - Run migrate:fresh --seed and verify minimum seed counts
 - Verification: 
-  - Students table: student_number unique ✓, user_id nullable+unique+FK ✓, program_id FK with RESTRICT ✓, status enum (ACTIVE/INACTIVE/GRADUATED) ✓, year_level unsigned tinyint ✓, indexes on program_id/status/year_level ✓
-  - ON DELETE SET NULL for user_id verified ✓
-  - ON DELETE RESTRICT for program_id verified ✓
-  - Duplicate student_number rejected ✓
-  - Duplicate user_id rejected ✓
-  - Invalid status rejected ✓
-  - Invalid program_id rejected ✓
-- Notes: Students table fully implemented and verified. Remaining tables need verification and seeders need to be created.
+  - All 12 migrations applied successfully ✓
+  - All table schemas verified with correct columns, types, constraints, indexes, enums ✓
+  - Foreign keys with proper ON DELETE behavior (RESTRICT/SET NULL) ✓
+  - Unique constraints (including composite) working ✓
+  - Seed counts: Users=6 (1 ADMIN, 1 REGISTRAR, 2 INSTRUCTOR, 2 STUDENT), Programs=3, Students=100, Courses=20, Academic Terms=2, Course Offerings=20, Enrollments=200, Grades=100 ✓
+  - Deterministic fixtures: 1 full offering (capacity 1), 2 instructors with offerings, 60 PUBLISHED / 40 DRAFT grades ✓
+  - No capacity violations, no duplicate enrollments, no duplicate student+offering pairs ✓
+  - Student users linked to profiles ✓
+- Notes: Phase 2 checkpoint verified - fresh database rebuild succeeds and count check confirms all minimum demonstration records.
 
 ## Phase 3 — Application Structure and API Contract
 
@@ -143,6 +145,68 @@
 - Notes: 
 
 ## Change History
+
+### 2026-09-11
+
+- Task: Complete Phase 2 - Database Schema, Relationships, and Seeders
+- Phase: Phase 2 — Database Schema and Seeders
+- Files changed: 
+  - backend/database/migrations/2026_09_11_111313_add_role_and_status_to_users_table.php (created)
+  - backend/database/migrations/2026_09_11_111334_create_programs_table.php (created)
+  - backend/database/migrations/2026_09_11_111354_create_courses_table.php (created)
+  - backend/database/migrations/2026_09_11_111401_create_academic_terms_table.php (created)
+  - backend/database/migrations/2026_09_11_111407_create_students_table.php (updated)
+  - backend/database/migrations/2026_09_11_111414_create_course_offerings_table.php (updated)
+  - backend/database/migrations/2026_09_11_111428_create_enrollments_table.php (updated)
+  - backend/database/migrations/2026_09_11_111432_create_grades_table.php (updated)
+  - backend/app/Models/User.php (updated with relationships)
+  - backend/app/Models/Program.php (created with relationships)
+  - backend/app/Models/Course.php (created with relationships)
+  - backend/app/Models/AcademicTerm.php (created with relationships)
+  - backend/app/Models/Student.php (created with relationships)
+  - backend/app/Models/CourseOffering.php (created with relationships)
+  - backend/app/Models/Enrollment.php (created with relationships)
+  - backend/app/Models/Grade.php (created with relationships)
+  - backend/database/factories/UserFactory.php (updated with role states)
+  - backend/database/factories/ProgramFactory.php (created)
+  - backend/database/factories/CourseFactory.php (created)
+  - backend/database/factories/AcademicTermFactory.php (created)
+  - backend/database/factories/StudentFactory.php (created)
+  - backend/database/factories/CourseOfferingFactory.php (created)
+  - backend/database/factories/EnrollmentFactory.php (created)
+  - backend/database/factories/GradeFactory.php (created)
+  - backend/database/seeders/DatabaseSeeder.php (updated with comprehensive seeding)
+  - docs/update.md (updated)
+- Implementation: 
+  - Created/updated all 8 table migrations with proper columns, types, constraints, indexes, enums
+  - Added role and status enums to users table (ADMIN, REGISTRAR, INSTRUCTOR, STUDENT / ACTIVE, INACTIVE)
+  - Created programs table with code, name, description, status (ACTIVE, INACTIVE)
+  - Created courses table with course_code, title, units (decimal), description, status (ACTIVE, INACTIVE)
+  - Created academic_terms table with academic_year, semester (1st, 2nd, Summer), dates, status (PLANNED, OPEN, CLOSED)
+  - Created students table with student_number, user_id (nullable, unique, FK), names, contact info, program_id (FK), year_level (1-6), status (ACTIVE, INACTIVE, GRADUATED)
+  - Created course_offerings table with course_id, academic_term_id, instructor_id (FKs), section, schedule, room, capacity, status (OPEN, CLOSED, CANCELLED)
+  - Created enrollments table with student_id, course_offering_id (FKs), enrollment_date, status (ENROLLED, DROPPED, COMPLETED), unique(student_id, course_offering_id)
+  - Created grades table with enrollment_id (unique, FK), midterm_grade, final_grade (decimal), remarks, status (DRAFT, PUBLISHED)
+  - All foreign keys use RESTRICT or SET NULL (no cascading deletes)
+  - Added indexes on frequently filtered columns
+  - Created factories for all models with appropriate states
+  - Created comprehensive DatabaseSeeder with dependency-ordered seeding
+  - Ran php artisan migrate:fresh --seed successfully
+- Constraints verified:
+  - All unique constraints working (student_number, user_id, course_code, course_offering composite, enrollment composite, grade enrollment_id)
+  - All foreign keys with correct ON DELETE behavior
+  - All enum constraints enforced
+  - No capacity violations
+  - No duplicate enrollments
+  - Student users linked to profiles
+- Tests executed: 
+  - php artisan migrate:fresh --seed (successful)
+  - Manual MySQL constraint verification
+  - Seed count verification
+- Test results: All constraints working as expected, all minimum seed counts met
+- Documentation updated: docs/update.md updated with Phase 2 completion
+- Remaining issues: Year level 1-6 validation at application level (Form Request), not database level
+- Next step: Phase 3 - Establish application structure and API contract
 
 ### 2026-09-11
 
