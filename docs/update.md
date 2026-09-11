@@ -3,10 +3,10 @@
 ## Current Phase
 
 - Phase: Phase 2 — Database Schema and Seeders
-- Status: Not Started (Phase 0 and 1 complete)
-- Current task: Design schema, relationships, and seeders for all 8 tables
+- Status: In Progress
+- Current task: Students table schema implemented and verified
 - Date: 2026-09-11
-- Overall progress: Phase 0 and 1 complete, ready for Phase 2
+- Overall progress: Phase 0 and 1 complete, Phase 2 in progress (students table done)
 
 ## Phase 0 — Requirements and Business Rules
 
@@ -49,12 +49,26 @@
 
 ## Phase 2 — Database Schema and Seeders
 
-- Status: Not Started
+- Status: In Progress
 - Completed: 
+  - Created migrations for all 8 tables (users role/status, programs, courses, academic_terms, students, course_offerings, enrollments, grades)
+  - All migrations applied successfully (12 total migrations)
+  - Students table schema implemented with all required fields and constraints
 - In progress: 
-- Pending: Design schema, relationships, and seeders for all 8 tables
+  - Students table schema verification
+- Pending: 
+  - Verify all other table schemas
+  - Create seeders/factories for all tables
+  - Run migrate:fresh --seed and verify minimum seed counts
 - Verification: 
-- Notes: Need to create migrations for users, students, programs, courses, academicterms, courseofferings, enrollments, grades
+  - Students table: student_number unique ✓, user_id nullable+unique+FK ✓, program_id FK with RESTRICT ✓, status enum (ACTIVE/INACTIVE/GRADUATED) ✓, year_level unsigned tinyint ✓, indexes on program_id/status/year_level ✓
+  - ON DELETE SET NULL for user_id verified ✓
+  - ON DELETE RESTRICT for program_id verified ✓
+  - Duplicate student_number rejected ✓
+  - Duplicate user_id rejected ✓
+  - Invalid status rejected ✓
+  - Invalid program_id rejected ✓
+- Notes: Students table fully implemented and verified. Remaining tables need verification and seeders need to be created.
 
 ## Phase 3 — Application Structure and API Contract
 
@@ -129,6 +143,39 @@
 - Notes: 
 
 ## Change History
+
+### 2026-09-11
+
+- Task: Students table schema implementation and verification (Phase 2)
+- Phase: Phase 2 — Database Schema and Seeders
+- Files changed: 
+  - backend/database/migrations/2026_09_11_111407_create_students_table.php (updated)
+  - docs/update.md (updated)
+- Implementation: 
+  - Updated students migration with all required fields per workflow.md:
+    - student_number (string, unique, required)
+    - user_id (foreignId, nullable, unique, FK to users.id with ON DELETE SET NULL)
+    - first_name, last_name (required), middle_name (nullable)
+    - email, phone, address, birth_date (nullable contact fields)
+    - program_id (foreignId, FK to programs.id with ON DELETE RESTRICT)
+    - year_level (unsignedTinyInteger, 1-6 validated at application level)
+    - status (enum: ACTIVE, INACTIVE, GRADUATED, default ACTIVE)
+    - timestamps
+  - Added indexes on program_id, status, year_level for frequently filtered fields
+- Constraints verified:
+  - student_number unique constraint ✓
+  - user_id nullable + unique + FK with ON DELETE SET NULL ✓
+  - program_id FK with ON DELETE RESTRICT ✓
+  - status enum constraint ✓
+  - Duplicate student_number rejected ✓
+  - Duplicate non-null user_id rejected ✓
+  - Invalid program_id rejected ✓
+  - Invalid status rejected ✓
+- Tests executed: Manual MySQL constraint verification
+- Test results: All constraints working as expected
+- Documentation updated: docs/update.md updated with Phase 2 progress
+- Remaining issues: Year level 1-6 validation at application level (Form Request), not database level
+- Next step: Verify remaining table schemas, create seeders/factories, run migrate:fresh --seed
 
 ### 2026-09-11
 
