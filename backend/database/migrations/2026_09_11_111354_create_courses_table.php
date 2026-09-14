@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->enum('status', ['ACTIVE', 'INACTIVE'])->default('ACTIVE');
             $table->timestamps();
-            
+
             $table->index('status');
         });
     }

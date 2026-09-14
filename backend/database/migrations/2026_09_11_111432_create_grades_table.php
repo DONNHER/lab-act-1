@@ -19,7 +19,7 @@ return new class extends Migration
             $table->text('remarks')->nullable();
             $table->enum('status', ['DRAFT', 'PUBLISHED'])->default('DRAFT');
             $table->timestamps();
-            
+
             $table->index('status');
         });
     }

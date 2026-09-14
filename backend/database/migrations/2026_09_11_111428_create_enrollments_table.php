@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date('enrollment_date');
             $table->enum('status', ['ENROLLED', 'DROPPED', 'COMPLETED'])->default('ENROLLED');
             $table->timestamps();
-            
+
             $table->unique(['student_id', 'course_offering_id']);
             $table->index('student_id');
             $table->index('course_offering_id');

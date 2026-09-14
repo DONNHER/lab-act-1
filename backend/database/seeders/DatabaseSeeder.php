@@ -21,16 +21,16 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Create Users and Programs (dependency order)
         $this->createUsersAndPrograms();
-        
+
         // 2. Create Students, Courses, and Academic Terms
         $this->createStudentsCoursesAndTerms();
-        
+
         // 3. Create Course Offerings
         $this->createCourseOfferings();
-        
+
         // 4. Create Enrollments
         $this->createEnrollments();
-        
+
         // 5. Create Grades
         $this->createGrades();
     }
@@ -115,7 +115,7 @@ class DatabaseSeeder extends Seeder
         // Create 100 students
         // First 2 students linked to the student users created earlier
         $students = collect();
-        
+
         // Create 2 students linked to the student users
         foreach ($this->studentUsers as $index => $user) {
             $student = Student::factory()->create([
@@ -129,7 +129,7 @@ class DatabaseSeeder extends Seeder
         $moreStudents = Student::factory(98)->create([
             'program_id' => $this->programs->random()->id,
         ]);
-        
+
         $students = $students->merge($moreStudents);
         $this->students = $students;
     }
@@ -140,11 +140,11 @@ class DatabaseSeeder extends Seeder
     private function createCourseOfferings(): void
     {
         $offerings = collect();
-        
+
         // Create offerings for term 1 (OPEN term)
         foreach ($this->courses as $index => $course) {
             $instructor = $this->instructors[$index % count($this->instructors)];
-            
+
             // Create at least one full offering (capacity 1)
             if ($index === 0) {
                 $offering = CourseOffering::factory()->full()->create([
@@ -169,7 +169,7 @@ class DatabaseSeeder extends Seeder
             $course = $this->courses->random();
             $term = $this->terms[array_rand($this->terms)];
             $instructor = $this->instructors->random();
-            
+
             $offering = CourseOffering::factory()->create([
                 'course_id' => $course->id,
                 'academic_term_id' => $term->id,
@@ -188,52 +188,52 @@ class DatabaseSeeder extends Seeder
     {
         $enrollments = collect();
         $targetCount = 200;
-        
+
         // Create enrollments ensuring we don't exceed capacity
         while ($enrollments->count() < $targetCount) {
             $student = $this->students->random();
             $offering = $this->offerings->random();
-            
+
             // Check if student is already enrolled in this offering
             $exists = Enrollment::where('student_id', $student->id)
                 ->where('course_offering_id', $offering->id)
                 ->exists();
-            
+
             if ($exists) {
                 continue;
             }
-            
+
             // Check capacity (count non-dropped enrollments)
             $occupiedSeats = Enrollment::where('course_offering_id', $offering->id)
                 ->whereIn('status', ['ENROLLED', 'COMPLETED'])
                 ->count();
-            
+
             if ($occupiedSeats >= $offering->capacity) {
                 continue;
             }
-            
+
             // Check student is active
             if ($student->status !== 'ACTIVE') {
                 continue;
             }
-            
+
             // Check offering is open
             if ($offering->status !== 'OPEN') {
                 continue;
             }
-            
+
             // Check term is open
             if ($offering->academicTerm->status !== 'OPEN') {
                 continue;
             }
-            
+
             $enrollment = Enrollment::factory()->create([
                 'student_id' => $student->id,
                 'course_offering_id' => $offering->id,
             ]);
             $enrollments->push($enrollment);
         }
-        
+
         $this->enrollments = $enrollments;
     }
 
@@ -244,16 +244,16 @@ class DatabaseSeeder extends Seeder
     {
         $grades = collect();
         $targetCount = 100;
-        
+
         // Get enrollments that are not dropped
         $eligibleEnrollments = $this->enrollments->where('status', '!=', 'DROPPED');
-        
+
         // Create grades for up to 100 enrollments
         $enrollmentsToGrade = $eligibleEnrollments->take($targetCount);
-        
+
         foreach ($enrollmentsToGrade as $enrollment) {
             $isPublished = fake()->boolean(60); // 60% published
-            
+
             if ($isPublished) {
                 $grade = Grade::factory()->published()->create([
                     'enrollment_id' => $enrollment->id,
@@ -265,7 +265,7 @@ class DatabaseSeeder extends Seeder
             }
             $grades->push($grade);
         }
-        
+
         $this->grades = $grades;
     }
 }

@@ -21,7 +21,7 @@ class StudentFactory extends Factory
         $hasPhone = fake()->boolean(70);
         $hasAddress = fake()->boolean(50);
         $hasBirthDate = fake()->boolean(80);
-        
+
         return [
             'student_number' => fake()->unique()->bothify('202?-#####'),
             'user_id' => null,

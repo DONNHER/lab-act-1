@@ -22,7 +22,7 @@ return new class extends Migration
             $table->unsignedInteger('capacity');
             $table->enum('status', ['OPEN', 'CLOSED', 'CANCELLED'])->default('OPEN');
             $table->timestamps();
-            
+
             $table->unique(['course_id', 'academic_term_id', 'section']);
             $table->index('academic_term_id');
             $table->index('instructor_id');

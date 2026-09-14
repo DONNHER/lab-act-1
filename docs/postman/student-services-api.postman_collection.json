@@ -1,0 +1,1487 @@
+{
+  "info": {
+    "name": "Student Services Portal API",
+    "description": "Postman collection for Student Information Management REST API. Includes all endpoints for authentication, users, programs, courses, academic terms, course offerings, enrollments, grades, and academic records.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "student-services-portal"
+  },
+  "variable": [
+    {
+      "key": "baseurl",
+      "value": "http://127.0.0.1:8000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "admintoken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "registrartoken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "instructortoken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "studenttoken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "programid",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "studentid",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "courseid",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "academictermid",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "courseofferingid",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "enrollmentid",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "gradeid",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/auth/login",
+              "host": ["{{baseurl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Has token', function () { pm.expect(pm.response.json()).to.have.property('data.token'); });",
+                  "pm.collectionVariables.set('admintoken', pm.response.json().data.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - Registrar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"registrar@example.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/auth/login",
+              "host": ["{{baseurl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.collectionVariables.set('registrartoken', pm.response.json().data.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - Instructor",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"instructor1@example.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/auth/login",
+              "host": ["{{baseurl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.collectionVariables.set('instructortoken', pm.response.json().data.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student1@example.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/auth/login",
+              "host": ["{{baseurl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.collectionVariables.set('studenttoken', pm.response.json().data.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Current User (Me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admintoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/auth/me",
+              "host": ["{{baseurl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admintoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/auth/logout",
+              "host": ["{{baseurl}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users (Admin Only)",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admintoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/users",
+              "host": ["{{baseurl}}"],
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admintoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New User\",\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password\",\n  \"role\": \"STUDENT\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/users",
+              "host": ["{{baseurl}}"],
+              "path": ["users"]
+            }
+          }
+        },
+        {
+          "name": "Get User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admintoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/users/1",
+              "host": ["{{baseurl}}"],
+              "path": ["users", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admintoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/users/1",
+              "host": ["{{baseurl}}"],
+              "path": ["users", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete User (Deactivate)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admintoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/users/1",
+              "host": ["{{baseurl}}"],
+              "path": ["users", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Programs",
+      "item": [
+        {
+          "name": "List Programs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/programs",
+              "host": ["{{baseurl}}"],
+              "path": ["programs"]
+            }
+          }
+        },
+        {
+          "name": "Create Program",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"BSCS\",\n  \"name\": \"Bachelor of Science in Computer Science\",\n  \"description\": \"Computer Science program\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/programs",
+              "host": ["{{baseurl}}"],
+              "path": ["programs"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('programid', pm.response.json().data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Program",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/programs/{{programid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["programs", "{{programid}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Program",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated description\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/programs/{{programid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["programs", "{{programid}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Program (Deactivate)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/programs/{{programid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["programs", "{{programid}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Courses",
+      "item": [
+        {
+          "name": "List Courses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/courses",
+              "host": ["{{baseurl}}"],
+              "path": ["courses"]
+            }
+          }
+        },
+        {
+          "name": "Create Course",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course_code\": \"CS101\",\n  \"title\": \"Introduction to Programming\",\n  \"units\": 3,\n  \"description\": \"Intro to programming concepts\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/courses",
+              "host": ["{{baseurl}}"],
+              "path": ["courses"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('courseid', pm.response.json().data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Course",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/courses/{{courseid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["courses", "{{courseid}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Course",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Course Title\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/courses/{{courseid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["courses", "{{courseid}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Course (Deactivate)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/courses/{{courseid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["courses", "{{courseid}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Academic Terms",
+      "item": [
+        {
+          "name": "List Academic Terms",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/academic-terms",
+              "host": ["{{baseurl}}"],
+              "path": ["academic-terms"]
+            }
+          }
+        },
+        {
+          "name": "Create Academic Term",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"academic_year\": \"2024-2025\",\n  \"semester\": \"1st\",\n  \"start_date\": \"2024-08-01\",\n  \"end_date\": \"2024-12-15\",\n  \"status\": \"OPEN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/academic-terms",
+              "host": ["{{baseurl}}"],
+              "path": ["academic-terms"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('academictermid', pm.response.json().data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Academic Term",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/academic-terms/{{academictermid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["academic-terms", "{{academictermid}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Academic Term",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CLOSED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/academic-terms/{{academictermid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["academic-terms", "{{academictermid}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Academic Term (Deactivate)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/academic-terms/{{academictermid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["academic-terms", "{{academictermid}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Students",
+      "item": [
+        {
+          "name": "List Students",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/students",
+              "host": ["{{baseurl}}"],
+              "path": ["students"]
+            }
+          }
+        },
+        {
+          "name": "Create Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_number\": \"2026-00001\",\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"program_id\": {{programid}},\n  \"year_level\": 1,\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/students",
+              "host": ["{{baseurl}}"],
+              "path": ["students"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('studentid', pm.response.json().data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/students/{{studentid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["students", "{{studentid}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Student",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+1-555-0123\",\n  \"address\": \"123 Main St\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/students/{{studentid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["students", "{{studentid}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Student (Deactivate)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/students/{{studentid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["students", "{{studentid}}"]
+            }
+          }
+        },
+        {
+          "name": "Student - View Own Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studenttoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/students/{{studentid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["students", "{{studentid}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Course Offerings",
+      "item": [
+        {
+          "name": "List Course Offerings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/course-offerings",
+              "host": ["{{baseurl}}"],
+              "path": ["course-offerings"]
+            }
+          }
+        },
+        {
+          "name": "Create Course Offering",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course_id\": {{courseid}},\n  \"academic_term_id\": {{academictermid}},\n  \"instructor_id\": 3,\n  \"section\": \"A\",\n  \"schedule\": \"MWF 10:00-11:00\",\n  \"room\": \"Room 101\",\n  \"capacity\": 30,\n  \"status\": \"OPEN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/course-offerings",
+              "host": ["{{baseurl}}"],
+              "path": ["course-offerings"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('courseofferingid', pm.response.json().data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Course Offering",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/course-offerings/{{courseofferingid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["course-offerings", "{{courseofferingid}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Course Offering",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"capacity\": 35\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/course-offerings/{{courseofferingid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["course-offerings", "{{courseofferingid}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Course Offering (Cancel)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/course-offerings/{{courseofferingid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["course-offerings", "{{courseofferingid}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Enrollments",
+      "item": [
+        {
+          "name": "List Enrollments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/enrollments",
+              "host": ["{{baseurl}}"],
+              "path": ["enrollments"]
+            }
+          }
+        },
+        {
+          "name": "Create Enrollment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": {{studentid}},\n  \"course_offering_id\": {{courseofferingid}},\n  \"enrollment_date\": \"2024-08-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/enrollments",
+              "host": ["{{baseurl}}"],
+              "path": ["enrollments"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('enrollmentid', pm.response.json().data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Enrollment",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/enrollments/{{enrollmentid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["enrollments", "{{enrollmentid}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Enrollment (Drop)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"DROPPED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/enrollments/{{enrollmentid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["enrollments", "{{enrollmentid}}"]
+            }
+          }
+        },
+        {
+          "name": "Restore Enrollment",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ENROLLED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/enrollments/{{enrollmentid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["enrollments", "{{enrollmentid}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Enrollment (Drop)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/enrollments/{{enrollmentid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["enrollments", "{{enrollmentid}}"]
+            }
+          }
+        },
+        {
+          "name": "Student Enrollments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studenttoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/students/{{studentid}}/enrollments",
+              "host": ["{{baseurl}}"],
+              "path": ["students", "{{studentid}}", "enrollments"]
+            }
+          }
+        },
+        {
+          "name": "Offering Students (Roster)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{instructortoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/course-offerings/{{courseofferingid}}/students",
+              "host": ["{{baseurl}}"],
+              "path": ["course-offerings", "{{courseofferingid}}", "students"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Grades",
+      "item": [
+        {
+          "name": "List Grades",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{instructortoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/grades",
+              "host": ["{{baseurl}}"],
+              "path": ["grades"]
+            }
+          }
+        },
+        {
+          "name": "Create/Update Grade",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{instructortoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enrollment_id\": {{enrollmentid}},\n  \"midterm_grade\": 85,\n  \"final_grade\": 90,\n  \"remarks\": \"Excellent work\",\n  \"status\": \"PUBLISHED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/grades",
+              "host": ["{{baseurl}}"],
+              "path": ["grades"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.collectionVariables.set('gradeid', pm.response.json().data.id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Grade",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{instructortoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/grades/{{gradeid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["grades", "{{gradeid}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Grade",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{instructortoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"final_grade\": 92,\n  \"remarks\": \"Updated remarks\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/grades/{{gradeid}}",
+              "host": ["{{baseurl}}"],
+              "path": ["grades", "{{gradeid}}"]
+            }
+          }
+        },
+        {
+          "name": "Student Grades (Published Only)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studenttoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/students/{{studentid}}/grades",
+              "host": ["{{baseurl}}"],
+              "path": ["students", "{{studentid}}", "grades"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Academic Records",
+      "item": [
+        {
+          "name": "Get Student Academic Record (Staff)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/students/{{studentid}}/academic-record",
+              "host": ["{{baseurl}}"],
+              "path": ["students", "{{studentid}}", "academic-record"]
+            }
+          }
+        },
+        {
+          "name": "Get Student Academic Record (Student)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studenttoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/students/{{studentid}}/academic-record",
+              "host": ["{{baseurl}}"],
+              "path": ["students", "{{studentid}}", "academic-record"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Negative Test Cases",
+      "item": [
+        {
+          "name": "401 - Unauthenticated Request",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseurl}}/students",
+              "host": ["{{baseurl}}"],
+              "path": ["students"]
+            }
+          }
+        },
+        {
+          "name": "403 - Student Accessing Another Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studenttoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/students/999",
+              "host": ["{{baseurl}}"],
+              "path": ["students", "999"]
+            }
+          }
+        },
+        {
+          "name": "403 - Instructor Grading Unrelated Enrollment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{instructortoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enrollment_id\": 999,\n  \"final_grade\": 80,\n  \"status\": \"PUBLISHED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/grades",
+              "host": ["{{baseurl}}"],
+              "path": ["grades"]
+            }
+          }
+        },
+        {
+          "name": "404 - Not Found",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{admintoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/students/99999",
+              "host": ["{{baseurl}}"],
+              "path": ["students", "99999"]
+            }
+          }
+        },
+        {
+          "name": "409 - Duplicate Student Number",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_number\": \"2026-00001\",\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Smith\",\n  \"program_id\": {{programid}},\n  \"year_level\": 1,\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/students",
+              "host": ["{{baseurl}}"],
+              "path": ["students"]
+            }
+          }
+        },
+        {
+          "name": "409 - Duplicate Enrollment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": {{studentid}},\n  \"course_offering_id\": {{courseofferingid}},\n  \"enrollment_date\": \"2024-08-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/enrollments",
+              "host": ["{{baseurl}}"],
+              "path": ["enrollments"]
+            }
+          }
+        },
+        {
+          "name": "422 - Invalid Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_number\": \"2026-00002\",\n  \"first_name\": \"Jane\",\n  \"last_name\": \"Smith\",\n  \"email\": \"invalid-email\",\n  \"program_id\": {{programid}},\n  \"year_level\": 1,\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseurl}}/students",
+              "host": ["{{baseurl}}"],
+              "path": ["students"]
+            }
+          }
+        },
+        {
+          "name": "422 - Invalid Sort Column",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/students?sort=invalid_column",
+              "host": ["{{baseurl}}"],
+              "path": ["students"],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "invalid_column"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "422 - Page Size Exceeds Maximum",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{registrartoken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseurl}}/students?per_page=200",
+              "host": ["{{baseurl}}"],
+              "path": ["students"],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "200"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

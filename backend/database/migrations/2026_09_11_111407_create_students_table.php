@@ -26,7 +26,7 @@ return new class extends Migration
             $table->unsignedTinyInteger('year_level');
             $table->enum('status', ['ACTIVE', 'INACTIVE', 'GRADUATED'])->default('ACTIVE');
             $table->timestamps();
-            
+
             $table->index('program_id');
             $table->index('status');
             $table->index('year_level');

@@ -1,8 +1,19 @@
 <?php
 
+use App\Http\Middleware\EnsureJsonResponse;
+use App\Http\Middleware\RoleMiddleware;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\HandleCors;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,8 +23,95 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->api(prepend: [
+            HandleCors::class,
+            EnsureJsonResponse::class,
+        ]);
+
+        $middleware->alias([
+            'role' => RoleMiddleware::class,
+            'throttle' => ThrottleRequests::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (ValidationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Validation failed.',
+                    'errors' => $e->errors(),
+                ], 422);
+            }
+        });
+
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                // Log authentication failure
+                Log::channel('security')->warning('Authentication failed', [
+                    'ip' => $request->ip(),
+                    'url' => $request->fullUrl(),
+                    'user_agent' => $request->userAgent(),
+                    'message' => $e->getMessage(),
+                ]);
+
+                return response()->json([
+                    'message' => 'Unauthenticated.',
+                ], 401);
+            }
+        });
+
+        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Resource not found.',
+                ], 404);
+            }
+        });
+
+        $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
+            if ($request->is('api/*')) {
+                // Log authorization failure
+                Log::channel('security')->warning('Access denied', [
+                    'ip' => $request->ip(),
+                    'user_id' => auth()->id(),
+                    'url' => $request->fullUrl(),
+                    'message' => $e->getMessage(),
+                ]);
+
+                return response()->json([
+                    'message' => 'Forbidden.',
+                ], 403);
+            }
+        });
+
+        $exceptions->render(function (HttpException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'message' => $e->getMessage() ?: 'An error occurred.',
+                ], $e->getStatusCode());
+            }
+        });
+
+        $exceptions->render(function (Throwable $e, Request $request) {
+            if ($request->is('api/*')) {
+                // Log unexpected errors
+                Log::channel('security')->error('Unexpected error', [
+                    'ip' => $request->ip(),
+                    'user_id' => auth()->id(),
+                    'url' => $request->fullUrl(),
+                    'message' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+
+                if (config('app.debug')) {
+                    return response()->json([
+                        'message' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString(),
+                    ], 500);
+                }
+
+                return response()->json([
+                    'message' => 'An unexpected error occurred.',
+                ], 500);
+            }
+        });
     })->create();

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('end_date');
             $table->enum('status', ['PLANNED', 'OPEN', 'CLOSED'])->default('PLANNED');
             $table->timestamps();
-            
+
             $table->unique(['academic_year', 'semester']);
             $table->index('status');
             $table->index(['start_date', 'end_date']);

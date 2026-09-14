@@ -17,14 +17,17 @@ class AcademicTermFactory extends Factory
      */
     public function definition(): array
     {
-        $year = fake()->numberBetween(2020, 2026);
-        $semester = fake()->randomElement(['1st', '2nd', 'Summer']);
-        
+        static $sequence = 0;
+        $year = 2020 + ($sequence % 10);
+        $semesters = ['1st', '2nd', 'Summer'];
+        $semester = $semesters[$sequence % 3];
+        $sequence++;
+
         return [
-            'academic_year' => "{$year}-" . ($year + 1),
+            'academic_year' => "{$year}-".($year + 1),
             'semester' => $semester,
-            'start_date' => fake()->dateTimeBetween("-1 year", "now")->format('Y-m-d'),
-            'end_date' => fake()->dateTimeBetween("now", "+1 year")->format('Y-m-d'),
+            'start_date' => $this->faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d'),
+            'end_date' => $this->faker->dateTimeBetween('now', '+1 year')->format('Y-m-d'),
             'status' => 'PLANNED',
         ];
     }
