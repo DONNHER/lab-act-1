@@ -33,12 +33,12 @@ class EnrollmentResource extends JsonResource
         return [
             'id' => $this->id,
             'student_id' => $this->student_id,
-            'student' => $this->whenLoaded('student', new StudentResource($this->student)),
+            'student' => $this->whenLoaded('student', fn () => new StudentResource($this->student)),
             'course_offering_id' => $this->course_offering_id,
-            'course_offering' => $this->whenLoaded('courseOffering', new CourseOfferingResource($this->courseOffering)),
+            'course_offering' => $this->whenLoaded('courseOffering', fn () => new CourseOfferingResource($this->courseOffering)),
             'enrollment_date' => $this->enrollment_date?->toISOString(),
             'status' => $this->status,
-            'grade' => $this->whenLoaded('grade', new GradeResource($this->grade)),
+            'grade' => $this->whenLoaded('grade', fn () => new GradeResource($this->grade)),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

@@ -17,14 +17,19 @@ class CourseOfferingFactory extends Factory
      */
     public function definition(): array
     {
+        $sections = ['A', 'B', 'C', 'D', 'E', 'F'];
+        $days = ['MWF', 'TTH', 'MW', 'TTHF', 'MTWTHF'];
+        $times = ['08:00-09:00', '09:00-10:00', '10:00-11:00', '11:00-12:00', '13:00-14:00', '14:00-15:00', '15:00-16:00', '16:00-17:00'];
+        $rooms = ['Room 101', 'Room 102', 'Room 103', 'Room 201', 'Room 202', 'Room 203', 'Lab 1', 'Lab 2', 'Lab 3', 'Auditorium A', 'Auditorium B'];
+
         return [
             'course_id' => null, // Will be set by seeder
             'academic_term_id' => null, // Will be set by seeder
             'instructor_id' => null, // Will be set by seeder
-            'section' => fake()->bothify('?-##'),
-            'schedule' => fake()->optional()->sentence(),
-            'room' => fake()->optional()->bothify('Room ###'),
-            'capacity' => fake()->numberBetween(20, 50),
+            'section' => fake()->randomElement($sections) . '-' . fake()->numberBetween(1, 99),
+            'schedule' => fake()->randomElement($days) . ' ' . fake()->randomElement($times),
+            'room' => fake()->randomElement($rooms),
+            'capacity' => fake()->randomElement([25, 30, 35, 40, 45, 50]),
             'status' => 'OPEN',
         ];
     }

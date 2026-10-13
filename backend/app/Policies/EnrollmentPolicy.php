@@ -12,7 +12,7 @@ class EnrollmentPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->role === 'ADMIN' || $user->role === 'REGISTRAR' || $user->role === 'INSTRUCTOR';
+        return $user->role === 'ADMIN' || $user->role === 'REGISTRAR' || $user->role === 'INSTRUCTOR' || $user->role === 'STUDENT';
     }
 
     /**
@@ -20,6 +20,9 @@ class EnrollmentPolicy
      */
     public function view(User $user, Enrollment $enrollment): bool
     {
+        // Load relationships if not already loaded
+        $enrollment->loadMissing('courseOffering', 'student.user');
+
         // Admin and Registrar can view all enrollments
         if ($user->role === 'ADMIN' || $user->role === 'REGISTRAR') {
             return true;
@@ -27,12 +30,12 @@ class EnrollmentPolicy
 
         // Instructor can view enrollments in their offerings
         if ($user->role === 'INSTRUCTOR') {
-            return $enrollment->courseOffering->instructor_id === $user->id;
+            return $enrollment->courseOffering && $enrollment->courseOffering->instructor_id === $user->id;
         }
 
         // Student can view their own enrollments
         if ($user->role === 'STUDENT') {
-            return $enrollment->student->user_id === $user->id;
+            return $enrollment->student && $enrollment->student->user_id === $user->id;
         }
 
         return false;
@@ -51,6 +54,9 @@ class EnrollmentPolicy
      */
     public function update(User $user, Enrollment $enrollment): bool
     {
+        // Load relationships if not already loaded
+        $enrollment->loadMissing('courseOffering', 'student.user');
+
         // Admin and Registrar can update all enrollments
         if ($user->role === 'ADMIN' || $user->role === 'REGISTRAR') {
             return true;
@@ -58,12 +64,12 @@ class EnrollmentPolicy
 
         // Instructor can update enrollments in their offerings (status changes)
         if ($user->role === 'INSTRUCTOR') {
-            return $enrollment->courseOffering->instructor_id === $user->id;
+            return $enrollment->courseOffering && $enrollment->courseOffering->instructor_id === $user->id;
         }
 
         // Student can drop their own enrollment
         if ($user->role === 'STUDENT') {
-            return $enrollment->student->user_id === $user->id;
+            return $enrollment->student && $enrollment->student->user_id === $user->id;
         }
 
         return false;
@@ -74,7 +80,19 @@ class EnrollmentPolicy
      */
     public function delete(User $user, Enrollment $enrollment): bool
     {
-        // Enrollments are not deleted, only status changed to DROPPED
+        // Load relationships if not already loaded
+        $enrollment->loadMissing('courseOffering', 'student.user');
+
+        // Admin and Registrar can drop any enrollment
+        if ($user->role === 'ADMIN' || $user->role === 'REGISTRAR') {
+            return true;
+        }
+
+        // Student can drop their own enrollment
+        if ($user->role === 'STUDENT') {
+            return $enrollment->student && $enrollment->student->user_id === $user->id;
+        }
+
         return false;
     }
 }

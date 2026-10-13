@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\AcademicTermController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\CourseOfferingController;
+use App\Http\Controllers\Api\V1\CurriculumController;
 use App\Http\Controllers\Api\V1\EnrollmentController;
 use App\Http\Controllers\Api\V1\GradeController;
 use App\Http\Controllers\Api\V1\ProgramController;
@@ -32,6 +33,9 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/auth/me', [AuthController::class, 'me']);
+        Route::get('/auth/redirect', [AuthController::class, 'redirect']);
+        Route::post('/auth/impersonate/{userId}', [AuthController::class, 'impersonate'])
+            ->middleware('role:ADMIN');
 
         // User management (admin only)
         Route::middleware('role:ADMIN')->group(function () {
@@ -42,6 +46,9 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('/programs', ProgramController::class);
         Route::apiResource('/courses', CourseController::class);
         Route::apiResource('/academic-terms', AcademicTermController::class);
+        Route::apiResource('/curriculum', CurriculumController::class);
+        Route::get('/programs/{program_id}/curriculum', [CurriculumController::class, 'byProgram']);
+        Route::get('/students/me', [StudentController::class, 'me']);
         Route::apiResource('/students', StudentController::class);
 
         // Academic transactions

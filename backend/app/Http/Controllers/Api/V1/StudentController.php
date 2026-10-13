@@ -154,6 +154,41 @@ class StudentController extends ApiController
     }
 
     /**
+     * Get the authenticated student's own record.
+     */
+    #[OA\Get(
+        path: '/students/me',
+        summary: 'Get authenticated student\'s own record',
+        description: 'Get the student record linked to the authenticated user',
+        tags: ['Students'],
+        security: [['sanctum' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Student details'),
+            new OA\Response(response: 401, description: 'Unauthenticated'),
+            new OA\Response(response: 403, description: 'Forbidden'),
+            new OA\Response(response: 404, description: 'Student record not found for this user'),
+        ]
+    )]
+    public function me(): JsonResponse
+    {
+        $user = auth()->user();
+
+        if ($user->role !== 'STUDENT') {
+            return $this->forbidden('Only students can access this endpoint.');
+        }
+
+        $student = Student::where('user_id', $user->id)->first();
+
+        if (!$student) {
+            return $this->notFound('Student record not found for this user.');
+        }
+
+        $this->authorize('view', $student);
+
+        return $this->success(new StudentResource($student->load('program')));
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     #[OA\Patch(

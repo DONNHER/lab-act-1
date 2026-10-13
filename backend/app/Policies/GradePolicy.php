@@ -12,7 +12,7 @@ class GradePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->role === 'ADMIN' || $user->role === 'REGISTRAR' || $user->role === 'INSTRUCTOR';
+        return $user->role === 'ADMIN' || $user->role === 'REGISTRAR' || $user->role === 'INSTRUCTOR' || $user->role === 'STUDENT';
     }
 
     /**
@@ -20,6 +20,9 @@ class GradePolicy
      */
     public function view(User $user, Grade $grade): bool
     {
+        // Ensure relationships are loaded for authorization checks
+        $grade->load('enrollment.courseOffering', 'enrollment.student.user');
+
         // Admin and Registrar can view all grades
         if ($user->role === 'ADMIN' || $user->role === 'REGISTRAR') {
             return true;
@@ -27,12 +30,12 @@ class GradePolicy
 
         // Instructor can view grades for their offerings
         if ($user->role === 'INSTRUCTOR') {
-            return $grade->enrollment->courseOffering->instructor_id === $user->id;
+            return $grade->enrollment && $grade->enrollment->courseOffering && $grade->enrollment->courseOffering->instructor_id === $user->id;
         }
 
         // Student can view their own published grades
         if ($user->role === 'STUDENT') {
-            return $grade->enrollment->student->user_id === $user->id && $grade->status === 'PUBLISHED';
+            return $grade->enrollment && $grade->enrollment->student && $grade->enrollment->student->user_id === $user->id && $grade->status === 'PUBLISHED';
         }
 
         return false;
@@ -51,6 +54,9 @@ class GradePolicy
      */
     public function update(User $user, Grade $grade): bool
     {
+        // Ensure relationships are loaded for authorization checks
+        $grade->load('enrollment.courseOffering');
+
         // Admin and Registrar can update all grades
         if ($user->role === 'ADMIN' || $user->role === 'REGISTRAR') {
             return true;
@@ -58,7 +64,7 @@ class GradePolicy
 
         // Instructor can update grades for their offerings
         if ($user->role === 'INSTRUCTOR') {
-            return $grade->enrollment->courseOffering->instructor_id === $user->id;
+            return $grade->enrollment && $grade->enrollment->courseOffering && $grade->enrollment->courseOffering->instructor_id === $user->id;
         }
 
         return false;
@@ -69,6 +75,19 @@ class GradePolicy
      */
     public function delete(User $user, Grade $grade): bool
     {
-        return $user->role === 'ADMIN' || $user->role === 'REGISTRAR';
+        // Ensure relationships are loaded for authorization checks
+        $grade->load('enrollment.courseOffering');
+
+        // Admin and Registrar can delete all grades
+        if ($user->role === 'ADMIN' || $user->role === 'REGISTRAR') {
+            return true;
+        }
+
+        // Instructor can delete grades for their offerings (if needed)
+        if ($user->role === 'INSTRUCTOR') {
+            return $grade->enrollment && $grade->enrollment->courseOffering && $grade->enrollment->courseOffering->instructor_id === $user->id;
+        }
+
+        return false;
     }
 }

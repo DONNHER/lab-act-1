@@ -25,8 +25,8 @@ class StoreEnrollmentRequest extends FormRequest
         return [
             'student_id' => ['required', 'exists:students,id'],
             'course_offering_id' => ['required', 'exists:course_offerings,id'],
-            'enrollment_date' => ['required', 'date'],
-            'status' => ['required', 'in:ENROLLED,DROPPED,COMPLETED'],
+            'enrollment_date' => ['nullable', 'date'],
+            'status' => ['nullable', 'in:ENROLLED,DROPPED,COMPLETED'],
         ];
     }
 

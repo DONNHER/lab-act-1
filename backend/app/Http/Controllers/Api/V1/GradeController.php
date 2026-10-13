@@ -6,6 +6,7 @@ use App\Http\Requests\Grade\IndexGradeRequest;
 use App\Http\Requests\Grade\StoreGradeRequest;
 use App\Http\Requests\Grade\UpdateGradeRequest;
 use App\Http\Resources\GradeResource;
+use App\Models\Enrollment;
 use App\Models\Grade;
 use App\Models\Student;
 use App\Services\GradeService;
@@ -134,6 +135,12 @@ class GradeController extends ApiController
     {
         $this->authorize('create', Grade::class);
 
+        $enrollment = Enrollment::with('courseOffering')->findOrFail($request->enrollment_id);
+
+        if (auth()->user()->role === 'INSTRUCTOR' && $enrollment->courseOffering->instructor_id !== auth()->id()) {
+            return $this->forbidden('You can only enter grades for your own course offerings.');
+        }
+
         $grade = $this->gradeService->upsertGrade($request->validated());
 
         return $this->created(new GradeResource($grade));
@@ -160,6 +167,9 @@ class GradeController extends ApiController
     )]
     public function show(Grade $grade): JsonResponse
     {
+        // Load relationships needed for authorization
+        $grade->load('enrollment.courseOffering', 'enrollment.student.user');
+        
         $this->authorize('view', $grade);
 
         return $this->success(new GradeResource($grade->load(['enrollment.student', 'enrollment.courseOffering.course', 'enrollment.courseOffering.academicTerm', 'enrollment.courseOffering.instructor'])));
@@ -197,6 +207,11 @@ class GradeController extends ApiController
     )]
     public function update(UpdateGradeRequest $request, Grade $grade): JsonResponse
     {
+        // Load relationships needed for authorization
+        $grade->load('enrollment.courseOffering');
+        
+        $this->authorize('update', $grade);
+
         $grade = $this->gradeService->upsertGrade(array_merge(
             ['enrollment_id' => $grade->enrollment_id],
             $request->validated()
@@ -210,6 +225,9 @@ class GradeController extends ApiController
      */
     public function destroy(Grade $grade): JsonResponse
     {
+        // Load relationships needed for authorization
+        $grade->load('enrollment.courseOffering');
+        
         $this->authorize('delete', $grade);
 
         $grade->delete();
@@ -222,6 +240,9 @@ class GradeController extends ApiController
      */
     public function publish(Grade $grade): JsonResponse
     {
+        // Load relationships needed for authorization
+        $grade->load('enrollment.courseOffering');
+        
         $this->authorize('update', $grade);
 
         $grade = $this->gradeService->publishGrade($grade);
@@ -234,6 +255,9 @@ class GradeController extends ApiController
      */
     public function unpublish(Grade $grade): JsonResponse
     {
+        // Load relationships needed for authorization
+        $grade->load('enrollment.courseOffering');
+        
         $this->authorize('update', $grade);
 
         $grade = $this->gradeService->unpublishGrade($grade);
@@ -246,7 +270,9 @@ class GradeController extends ApiController
      */
     public function byStudent(Student $student): JsonResponse
     {
-        $this->authorize('viewAny', Grade::class);
+        // This nested endpoint exposes a student's academic data.  Authorize
+        // the requested student record, not only the caller's role.
+        $this->authorize('view', $student);
 
         $grades = Grade::whereHas('enrollment.student', function ($query) use ($student) {
             $query->where('id', $student->id);

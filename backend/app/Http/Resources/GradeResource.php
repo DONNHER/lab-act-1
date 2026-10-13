@@ -32,7 +32,7 @@ class GradeResource extends JsonResource
         return [
             'id' => $this->id,
             'enrollment_id' => $this->enrollment_id,
-            'enrollment' => $this->whenLoaded('enrollment', new EnrollmentResource($this->enrollment)),
+            'enrollment' => $this->whenLoaded('enrollment', fn () => new EnrollmentResource($this->enrollment)),
             'midterm_grade' => $this->midterm_grade,
             'final_grade' => $this->final_grade,
             'remarks' => $this->remarks,

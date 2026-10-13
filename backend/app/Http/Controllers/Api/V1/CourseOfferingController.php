@@ -86,7 +86,26 @@ class CourseOfferingController extends ApiController
 
         $offerings = $query->paginate($request->validatedPerPage());
 
-        return $this->paginated($offerings);
+        $data = CourseOfferingResource::collection($offerings->items());
+
+        return response()->json([
+            'data' => $data,
+            'links' => [
+                'first' => $offerings->url(1),
+                'last' => $offerings->url($offerings->lastPage()),
+                'prev' => $offerings->previousPageUrl(),
+                'next' => $offerings->nextPageUrl(),
+            ],
+            'meta' => [
+                'current_page' => $offerings->currentPage(),
+                'from' => $offerings->firstItem(),
+                'last_page' => $offerings->lastPage(),
+                'path' => $offerings->path(),
+                'per_page' => $offerings->perPage(),
+                'to' => $offerings->lastItem(),
+                'total' => $offerings->total(),
+            ],
+        ]);
     }
 
     /**

@@ -136,6 +136,15 @@ class EnrollmentController extends ApiController
     {
         $this->authorize('create', Enrollment::class);
 
+        $exists = Enrollment::where('student_id', $request->student_id)
+            ->where('course_offering_id', $request->course_offering_id)
+            ->where('status', '!=', 'DROPPED')
+            ->exists();
+
+        if ($exists) {
+            return $this->conflict('Student is already enrolled in this course offering.');
+        }
+
         $enrollment = $this->enrollmentService->createEnrollment($request->validated());
 
         return $this->created(new EnrollmentResource($enrollment));
@@ -160,6 +169,9 @@ class EnrollmentController extends ApiController
     )]
     public function show(Enrollment $enrollment): JsonResponse
     {
+        // Load relationships needed for authorization
+        $enrollment->load('courseOffering', 'student.user');
+        
         $this->authorize('view', $enrollment);
 
         return $this->success(new EnrollmentResource($enrollment->load(['student', 'courseOffering.course', 'courseOffering.academicTerm', 'courseOffering.instructor', 'grade'])));
@@ -191,6 +203,9 @@ class EnrollmentController extends ApiController
     )]
     public function update(UpdateEnrollmentRequest $request, Enrollment $enrollment): JsonResponse
     {
+        // Load relationships needed for authorization
+        $enrollment->load('courseOffering', 'student.user');
+        
         $this->authorize('update', $enrollment);
 
         $data = $request->validated();
@@ -216,6 +231,9 @@ class EnrollmentController extends ApiController
      */
     public function destroy(Enrollment $enrollment): JsonResponse
     {
+        // Load relationships needed for authorization
+        $enrollment->load('courseOffering', 'student.user');
+        
         $this->authorize('delete', $enrollment);
 
         $enrollment = $this->enrollmentService->dropEnrollment($enrollment);
